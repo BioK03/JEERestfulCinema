@@ -21,7 +21,6 @@ import metier.Director;
 import metier.Movie;
 import metier.Personage;
 
-
 @Path("/cinema")
 public class WService {
 	private EntityManagerFactory emf;
@@ -249,6 +248,44 @@ public class WService {
 		{
 			movies.add(p.getMovie());
 		}
+		
+		em.getTransaction().commit();
+		em.close();
+		
+		String json = gson.toJson(movies);
+		return json;
+	}
+	
+	@GET
+	@Path("/movie/category/{categoryid}")
+	@Produces("application/json")
+	public String fetchMovieByCategory(@PathParam("categoryid")  String categoryId) throws Exception
+	{
+		emf = Persistence.createEntityManagerFactory("cinema");
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
+		EntityManager em = emf.createEntityManager();
+		
+		em.getTransaction().begin();
+		List<Movie> movies = em.createNamedQuery("Movie.findByCategory", Movie.class).setParameter("categoryid", categoryId).getResultList();
+		
+		em.getTransaction().commit();
+		em.close();
+		
+		String json = gson.toJson(movies);
+		return json;
+	}
+	
+	@GET
+	@Path("/movie/director/{directorid}")
+	@Produces("application/json")
+	public String fetchMovieByDirector(@PathParam("directorid")  int directorId) throws Exception
+	{
+		emf = Persistence.createEntityManagerFactory("cinema");
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
+		EntityManager em = emf.createEntityManager();
+		
+		em.getTransaction().begin();
+		List<Movie> movies = em.createNamedQuery("Movie.findByDirector", Movie.class).setParameter("directorid", directorId).getResultList();
 		
 		em.getTransaction().commit();
 		em.close();

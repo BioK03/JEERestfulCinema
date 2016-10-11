@@ -14,6 +14,8 @@ import java.util.List;
 @NamedQueries({
 	@NamedQuery(name="Movie.findAll", query="SELECT m FROM Movie m"),
 	@NamedQuery(name="Movie.find", query="SELECT m FROM Movie m WHERE m.noMovie = :id"),
+	@NamedQuery(name="Movie.findByCategory", query="SELECT m FROM Movie m WHERE m.category.catCode = :categoryid"),
+	@NamedQuery(name="Movie.findByDirector", query="SELECT m FROM Movie m WHERE m.director.noRea = :directorid"),
 	@NamedQuery(name="Movie.delete", query="DELETE FROM Movie m WHERE m.noMovie = :id"),
 	@NamedQuery(name="Movie.deleteByCategory", query="DELETE FROM Movie m WHERE m.category.catCode = :categoryid"),
 	@NamedQuery(name="Movie.search", query="SELECT m FROM Movie m WHERE m.title LIKE :term")

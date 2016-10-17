@@ -1,9 +1,14 @@
 package service;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -362,73 +367,126 @@ public class WService {
 	
 	@POST
 	@Path("actor/add/")
-	public void addActor(@FormParam("actor") String actorString) {
+	public void addActor(
+			@FormParam("birthdate") String birthdate,
+			@FormParam("deathdate") String deathdate,
+			@FormParam("firstnameAct") String firstnameAct,
+			@FormParam("lastnameAct") String lastnameAct,
+			@FormParam("picture") String picture) throws Exception {
 		emf = Persistence.createEntityManagerFactory("cinema");
 		EntityManager em = emf.createEntityManager();
 		
-		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
-		Actor actor = gson.fromJson(actorString, Actor.class);
+		em.getTransaction().begin();
 		
-		em.persist(actor);
+		Actor a = new Actor();
+		
+		DateFormat format = new SimpleDateFormat("yyyy-M-d", Locale.ENGLISH);
+		
+		a.setBirthdate(format.parse(birthdate));
+		a.setDeathdate(format.parse(deathdate));
+		a.setFirstnameAct(firstnameAct);
+		a.setLastnameAct(lastnameAct);
+		a.setPicture(picture);
+		
+		em.persist(a);
+		
+		em.getTransaction().commit();
+		em.close();
 	}
 	
 	@POST
 	@Path("category/add/")
-	public void addCategory(@FormParam("catCode") String categoryCatCode, @FormParam("wording") String categoryWording) {
+	public void addCategory(
+			@FormParam("catCode") String catCode,
+			@FormParam("wording") String wording,
+			@FormParam("picture") String picture) {
 		emf = Persistence.createEntityManagerFactory("cinema");
 		EntityManager em = emf.createEntityManager();
 		
 		em.getTransaction().begin();
 		
 		Category c = new Category();
-		c.setCatCode(categoryCatCode);
-		c.setWording(categoryWording);
+		c.setCatCode(catCode);
+		c.setWording(wording);
+		c.setPicture(picture);
 		c.setPicture(null);
 		
 		em.persist(c);
 		
 		em.getTransaction().commit();
 		em.close();
-		
 	}
 	
 	@POST
-	@Path("director/add/{director}")
-	@Consumes("application/json")
-	public void addDirector(@PathParam("director") String directorString) {
+	@Path("director/add/")
+	public void addDirector(
+			@FormParam("firstnameRea") String firstnameRea,
+			@FormParam("lastnameRea") String lastnameRea,
+			@FormParam("picture") String picture){
 		emf = Persistence.createEntityManagerFactory("cinema");
 		EntityManager em = emf.createEntityManager();
 		
-		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
-		Director director = gson.fromJson(directorString, Director.class);
+		em.getTransaction().begin();
 		
-		em.persist(director);
+		Director d = new Director();
+		d.setFirstnameRea(firstnameRea);
+		d.setLastnameRea(lastnameRea);
+		d.setPicture(picture);
+		
+		em.persist(d);
+		
+		em.getTransaction().commit();
+		em.close();
 	}
 	
 	@POST
-	@Path("movie/add/{movie}")
-	@Consumes("application/json")
-	public void addMovie(@PathParam("movie") String movieString) {
+	@Path("movie/add/")
+	public void addMovie(
+			@FormParam("allocineLink") String allocineLink,
+			@FormParam("budget") String budget,
+			@FormParam("duration") String duration,
+			@FormParam("incomings") String incomings,
+			@FormParam("picture") String picture,
+			@FormParam("releaseDate") String releaseDate,
+			@FormParam("title") String title) throws ParseException {
 		emf = Persistence.createEntityManagerFactory("cinema");
 		EntityManager em = emf.createEntityManager();
 		
-		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
-		Movie movie = gson.fromJson(movieString, Movie.class);
+		em.getTransaction().begin();
 		
-		em.persist(movie);
+		DateFormat format = new SimpleDateFormat("yyyy-M-d", Locale.ENGLISH);
+		
+		Movie m = new Movie();
+		m.setAllocineLink(allocineLink);
+		m.setBudget(Integer.parseInt(budget));
+		m.setDuration(Integer.parseInt(duration));
+		m.setIncomings(Integer.parseInt(incomings));
+		m.setPicture(picture);
+		m.setReleaseDate(format.parse(releaseDate));
+		m.setTitle(title);
+		
+		em.persist(m);
+		
+		em.getTransaction().commit();
+		em.close();
 	}
 	
 	@POST
-	@Path("personage/add/{personage}")
-	@Consumes("application/json")
-	public void addPersonage(@PathParam("personage") String personageString) {
+	@Path("personage/add/")
+	public void addPersonage(
+			@FormParam("persName") String persName) {
 		emf = Persistence.createEntityManagerFactory("cinema");
 		EntityManager em = emf.createEntityManager();
 		
-		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
-		Personage personage = gson.fromJson(personageString, Personage.class);
+		em.getTransaction().begin();
 		
-		em.persist(personage);
+		Personage p = new Personage();
+		p.setPersName(persName);
+		
+		em.persist(p);
+		
+		em.getTransaction().commit();
+		em.close();
 	}
 	
 	/*
@@ -440,39 +498,46 @@ public class WService {
 	 */
 	
 	@POST
-	@Path("/actor/edit/{actor}")
-	@Consumes("application/json")
-	public void editActor(@PathParam("actor") String actorString) {
+	@Path("/actor/edit/")
+	public void editActor(
+			@FormParam("noAct") String noAct,
+			@FormParam("birthdate") String birthdate,
+			@FormParam("deathdate") String deathdate,
+			@FormParam("firstnameAct") String firstnameAct,
+			@FormParam("lastnameAct") String lastnameAct,
+			@FormParam("picture") String picture) throws ParseException {
 		emf = Persistence.createEntityManagerFactory("cinema");
 		EntityManager em = emf.createEntityManager();
 		
-		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
-		Actor actor = gson.fromJson(actorString, Actor.class);
-		
-		Actor actorToBeUpdated = em.createNamedQuery("Actor.find", Actor.class).setParameter("id", actor.getNoAct()).getResultList().get(0);
-		
 		em.getTransaction().begin();
 		
-		actorToBeUpdated.setBirthdate(actor.getBirthdate());
-		actorToBeUpdated.setDeathdate(actor.getDeathdate());
-		actorToBeUpdated.setFirstnameAct(actor.getFirstnameAct());
-		actorToBeUpdated.setLastnameAct(actor.getLastnameAct());
-		actorToBeUpdated.setPersonages(actor.getPersonages());
-		actor.setPicture(actor.getPicture());
+		Actor a = em.createNamedQuery("Actor.find", Actor.class).setParameter("id", noAct).getResultList().get(0);
+		
+		DateFormat format = new SimpleDateFormat("yyyy-M-d", Locale.ENGLISH);
+		
+		a.setBirthdate(format.parse(birthdate));
+		a.setDeathdate(format.parse(deathdate));
+		a.setFirstnameAct(firstnameAct);
+		a.setLastnameAct(lastnameAct);
+		a.setPicture(picture);
+		
+		em.flush();
 		
 		em.getTransaction().commit();
+		em.close();
 	}
 	
 	@POST
 	@Path("/category/edit/")
-	public void editCategory(@FormParam("catCode") String categoryCatCode, @FormParam("wording") String categoryWording) {
+	public void editCategory(
+			@FormParam("catCode") String categoryCatCode, 
+			@FormParam("wording") String categoryWording) {
 		emf = Persistence.createEntityManagerFactory("cinema");
 		EntityManager em = emf.createEntityManager();
 		
 		em.getTransaction().begin();
 		
 		Category c = em.createNamedQuery("Category.find", Category.class).setParameter("id", categoryCatCode).getResultList().get(0);
-		
 		c.setWording(categoryWording);
 		
 		em.flush();
@@ -482,73 +547,81 @@ public class WService {
 	}
 	
 	@POST
-	@Path("/director/edit/{director}")
-	@Consumes("application/json")
-	public void editDirector(@PathParam("director") String directorString) {
+	@Path("/director/edit/")
+	public void editDirector(
+			@FormParam("noRea") String noRea,
+			@FormParam("firstnameRea") String firstnameRea,
+			@FormParam("lastnameRea") String lastnameRea,
+			@FormParam("picture") String picture) {
+			
 		emf = Persistence.createEntityManagerFactory("cinema");
 		EntityManager em = emf.createEntityManager();
 		
-		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
-		Director director = gson.fromJson(directorString, Director.class);
-		
-		Director directorToBeUpdated = em.createNamedQuery("Director.find", Director.class).setParameter("id", director.getNoRea()).getResultList().get(0);
-		
 		em.getTransaction().begin();
 		
-		directorToBeUpdated.setFirstnameRea(director.getFirstnameRea());
-		directorToBeUpdated.setLastnameRea(director.getLastnameRea());
-		directorToBeUpdated.setMovies(director.getMovies());
-		directorToBeUpdated.setPicture(director.getPicture());
+		Director d = em.createNamedQuery("Director.find", Director.class).setParameter("id", noRea).getResultList().get(0);
+		d.setFirstnameRea(firstnameRea);
+		d.setLastnameRea(lastnameRea);
+		d.setPicture(picture);
+		
+		em.flush();
 		
 		em.getTransaction().commit();
+		em.close();
 	}
 	
 	@POST
-	@Path("/movie/edit/{movie}")
-	@Consumes("application/json")
-	public void editMovie(@PathParam("movie") String movieString) {
+	@Path("/movie/edit/")
+	public void editMovie(
+			@FormParam("noMovie") String noMovie,
+			@FormParam("allocineLink") String allocineLink,
+			@FormParam("budget") String budget,
+			@FormParam("duration") String duration,
+			@FormParam("incomings") String incomings,
+			@FormParam("picture") String picture,
+			@FormParam("releaseDate") String releaseDate,
+			@FormParam("title") String title) throws ParseException {
 		emf = Persistence.createEntityManagerFactory("cinema");
 		EntityManager em = emf.createEntityManager();
 		
-		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
-		Movie movie = gson.fromJson(movieString, Movie.class);
-		
-		Movie movieToBeUpdated = em.createNamedQuery("Movie.find", Movie.class).setParameter("id", movie.getNoMovie()).getResultList().get(0);
-		
 		em.getTransaction().begin();
 		
-		movieToBeUpdated.setAllocineLink(movie.getAllocineLink());
-		movieToBeUpdated.setBudget(movie.getBudget());
-		movieToBeUpdated.setCategory(movie.getCategory());
-		movieToBeUpdated.setDirector(movie.getDirector());
-		movieToBeUpdated.setDuration(movie.getDuration());
-		movieToBeUpdated.setIncomings(movie.getIncomings());
-		movieToBeUpdated.setPersonages(movie.getPersonages());
-		movieToBeUpdated.setPicture(movie.getPicture());
-		movieToBeUpdated.setReleaseDate(movie.getReleaseDate());
-		movieToBeUpdated.setTitle(movie.getTitle());
+		DateFormat format = new SimpleDateFormat("yyyy-M-d", Locale.ENGLISH);
+		
+		Movie m = em.createNamedQuery("Movie.find", Movie.class).setParameter("id", noMovie).getResultList().get(0);
+		m.setAllocineLink(allocineLink);
+		m.setBudget(Integer.parseInt(budget));
+		m.setDuration(Integer.parseInt(duration));
+		m.setIncomings(Integer.parseInt(incomings));
+		m.setPicture(picture);
+		m.setReleaseDate(format.parse(releaseDate));
+		m.setTitle(title);
+		
+		em.flush();
 		
 		em.getTransaction().commit();
+		em.close();
 	}
 	
 	@POST
-	@Path("/personage/edit/{personage}")
-	@Consumes("application/json")
-	public void editPersonage(@PathParam("personage") String personageString) {
+	@Path("/personage/edit/")
+	public void editPersonage(
+			@FormParam("noMovie") String noMovie,
+			@FormParam("noAct") String noAct,
+			@FormParam("persName") String persName) {
 		emf = Persistence.createEntityManagerFactory("cinema");
 		EntityManager em = emf.createEntityManager();
 		
-		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
-		Personage personage = gson.fromJson(personageString, Personage.class);
-		
-		Personage personageToBeUpdated = em.createNamedQuery("Personage.find", Personage.class)
-				.setParameter("movieid", personage.getMovie().getNoMovie()).setParameter("actorid", personage.getActor().getNoAct()).getResultList().get(0);
-		
 		em.getTransaction().begin();
 		
-		personageToBeUpdated.setPersName(personage.getPersName());
+		Personage p = em.createNamedQuery("Personage.find", Personage.class).setParameter("movieid", noMovie).setParameter("actorid", noAct)
+				.getResultList().get(0);
+		p.setPersName(persName);
+		
+		em.flush();
 		
 		em.getTransaction().commit();
+		em.close();
 	}
 	
 	/*

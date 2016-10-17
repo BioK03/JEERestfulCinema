@@ -11,6 +11,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -359,10 +360,9 @@ public class WService {
 	 ■ ■ ■■  ■■
 	 */
 	
-	@PUT
-	@Path("actor/add/{actor}")
-	@Consumes("application/json")
-	public void addActor(@PathParam("actor") String actorString) {
+	@POST
+	@Path("actor/add/")
+	public void addActor(@FormParam("actor") String actorString) {
 		emf = Persistence.createEntityManagerFactory("cinema");
 		EntityManager em = emf.createEntityManager();
 		
@@ -372,20 +372,27 @@ public class WService {
 		em.persist(actor);
 	}
 	
-	@PUT
-	@Path("category/add/{category}")
-	@Consumes("application/json")
-	public void addCategory(@PathParam("category") String categoryString) {
+	@POST
+	@Path("category/add/")
+	public void addCategory(@FormParam("catCode") String categoryCatCode, @FormParam("wording") String categoryWording) {
 		emf = Persistence.createEntityManagerFactory("cinema");
 		EntityManager em = emf.createEntityManager();
 		
-		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
-		Category category = gson.fromJson(categoryString, Category.class);
+		em.getTransaction().begin();
 		
-		em.persist(category);
+		Category c = new Category();
+		c.setCatCode(categoryCatCode);
+		c.setWording(categoryWording);
+		c.setPicture(null);
+		
+		em.persist(c);
+		
+		em.getTransaction().commit();
+		em.close();
+		
 	}
 	
-	@PUT
+	@POST
 	@Path("director/add/{director}")
 	@Consumes("application/json")
 	public void addDirector(@PathParam("director") String directorString) {
@@ -398,7 +405,7 @@ public class WService {
 		em.persist(director);
 	}
 	
-	@PUT
+	@POST
 	@Path("movie/add/{movie}")
 	@Consumes("application/json")
 	public void addMovie(@PathParam("movie") String movieString) {
@@ -411,7 +418,7 @@ public class WService {
 		em.persist(movie);
 	}
 	
-	@PUT
+	@POST
 	@Path("personage/add/{personage}")
 	@Consumes("application/json")
 	public void addPersonage(@PathParam("personage") String personageString) {
@@ -457,24 +464,21 @@ public class WService {
 	}
 	
 	@POST
-	@Path("/category/edit/{category}")
-	@Consumes("application/json")
-	public void editCategory(@PathParam("category") String categoryString) {
+	@Path("/category/edit/")
+	public void editCategory(@FormParam("catCode") String categoryCatCode, @FormParam("wording") String categoryWording) {
 		emf = Persistence.createEntityManagerFactory("cinema");
 		EntityManager em = emf.createEntityManager();
 		
-		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
-		Category category = gson.fromJson(categoryString, Category.class);
-		
-		Category categoryToBeUpdated = em.createNamedQuery("Category.find", Category.class).setParameter("id", category.getCatCode()).getResultList().get(0);
-		
 		em.getTransaction().begin();
 		
-		categoryToBeUpdated.setMovies(category.getMovies());
-		categoryToBeUpdated.setPicture(category.getPicture());
-		categoryToBeUpdated.setWording(category.getWording());
+		Category c = em.createNamedQuery("Category.find", Category.class).setParameter("id", categoryCatCode).getResultList().get(0);
+		
+		c.setWording(categoryWording);
+		
+		em.flush();
 		
 		em.getTransaction().commit();
+		em.close();
 	}
 	
 	@POST
@@ -555,7 +559,7 @@ public class WService {
 	 ■■  ■■■ ■■■ ■■■  ■  ■■■
 	 */
 	
-	@DELETE
+	@GET
 	@Path("/actor/delete/{id}")
 	public void deleteActor(@PathParam("id")  int actorId) throws Exception
 	{
@@ -570,7 +574,7 @@ public class WService {
 		em.close();
 	}
 	
-	@DELETE
+	@GET
 	@Path("/category/delete/{id}")
 	public void deleteCategory(@PathParam("id")  String categoryId) throws Exception
 	{
@@ -586,7 +590,7 @@ public class WService {
 		em.close();
 	}
 	
-	@DELETE
+	@GET
 	@Path("/director/delete/{id}")
 	public void deleteDirector(@PathParam("id")  int directorId) throws Exception
 	{
@@ -600,7 +604,7 @@ public class WService {
 		em.close();
 	}
 	
-	@DELETE
+	@GET
 	@Path("/movie/delete/{id}")
 	public void deleteMovie(@PathParam("id")  int movieId) throws Exception
 	{
@@ -615,7 +619,7 @@ public class WService {
 		em.close();
 	}
 	
-	@DELETE
+	@GET
 	@Path("/movie/delete/category/{categoryid}")
 	public void deleteMovieByCategory(@PathParam("categoryid")  String categoryId) throws Exception
 	{
@@ -630,7 +634,7 @@ public class WService {
 		em.close();
 	}
 	
-	@DELETE
+	@GET
 	@Path("/personage/delete/{movieid}/{actorid}")
 	public void deletePersonage(@PathParam("movieid")  int movieId, @PathParam("actorid") int actorId) throws Exception
 	{
@@ -644,7 +648,7 @@ public class WService {
 		em.close();
 	}
 	
-	@DELETE
+	@GET
 	@Path("/personage/delete/actor/{actorid}")
 	public void deletePersonageByActor(@PathParam("actorid") int actorId) throws Exception
 	{
@@ -658,7 +662,7 @@ public class WService {
 		em.close();
 	}
 	
-	@DELETE
+	@GET
 	@Path("/personage/delete/movie/{movieid}")
 	public void deletePersonageByMovie(@PathParam("movieid") int movieId) throws Exception
 	{
@@ -672,7 +676,7 @@ public class WService {
 		em.close();
 	}
 	
-	@DELETE
+	@GET
 	@Path("/personage/delete/category/{categoryid}")
 	public void deletePersonageByCategory(@PathParam("categoryid") int categoryId) throws Exception
 	{

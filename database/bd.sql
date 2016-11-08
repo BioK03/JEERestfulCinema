@@ -7,7 +7,6 @@
 -- Version du serveur: 5.5.8
 -- Version de PHP: 5.3.5
 
-SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 
 CREATE DATABASE IF NOT EXISTS `cinema_jee`;
 

@@ -4,7 +4,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -16,7 +15,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -368,10 +366,10 @@ public class WService {
 	@POST
 	@Path("actor/add/")
 	public void addActor(
-			@FormParam("birthdate") String birthdate,
-			@FormParam("deathdate") String deathdate,
-			@FormParam("firstnameAct") String firstnameAct,
 			@FormParam("lastnameAct") String lastnameAct,
+			@FormParam("firstnameAct") String firstnameAct,
+			@FormParam("birthdate") String birthdate,
+			@FormParam("deathdate") String deathdate,			
 			@FormParam("picture") String picture) throws Exception {
 		emf = Persistence.createEntityManagerFactory("cinema");
 		EntityManager em = emf.createEntityManager();
@@ -382,10 +380,10 @@ public class WService {
 		
 		DateFormat format = new SimpleDateFormat("yyyy-M-d", Locale.ENGLISH);
 		
-		a.setBirthdate(format.parse(birthdate));
-		a.setDeathdate(format.parse(deathdate));
-		a.setFirstnameAct(firstnameAct);
 		a.setLastnameAct(lastnameAct);
+		a.setFirstnameAct(firstnameAct);
+		a.setBirthdate(format.parse(birthdate));
+		a.setDeathdate(format.parse(deathdate));		
 		a.setPicture(picture);
 		
 		em.persist(a);
@@ -409,7 +407,6 @@ public class WService {
 		c.setCatCode(catCode);
 		c.setWording(wording);
 		c.setPicture(picture);
-		c.setPicture(null);
 		
 		em.persist(c);
 		
@@ -420,8 +417,8 @@ public class WService {
 	@POST
 	@Path("director/add/")
 	public void addDirector(
-			@FormParam("firstnameRea") String firstnameRea,
 			@FormParam("lastnameRea") String lastnameRea,
+			@FormParam("firstnameRea") String firstnameRea,
 			@FormParam("picture") String picture){
 		emf = Persistence.createEntityManagerFactory("cinema");
 		EntityManager em = emf.createEntityManager();
@@ -429,8 +426,8 @@ public class WService {
 		em.getTransaction().begin();
 		
 		Director d = new Director();
-		d.setFirstnameRea(firstnameRea);
 		d.setLastnameRea(lastnameRea);
+		d.setFirstnameRea(firstnameRea);
 		d.setPicture(picture);
 		
 		em.persist(d);
@@ -442,13 +439,15 @@ public class WService {
 	@POST
 	@Path("movie/add/")
 	public void addMovie(
-			@FormParam("allocineLink") String allocineLink,
-			@FormParam("budget") String budget,
+			@FormParam("title") String title,
 			@FormParam("duration") String duration,
-			@FormParam("incomings") String incomings,
-			@FormParam("picture") String picture,
 			@FormParam("releaseDate") String releaseDate,
-			@FormParam("title") String title) throws ParseException {
+			@FormParam("budget") String budget,
+			@FormParam("incomings") String incomings,
+			@FormParam("director") int directorId,
+			@FormParam("category") int categoryId,
+			@FormParam("picture") String picture,
+			@FormParam("allocineLink") String allocineLink) throws ParseException {
 		emf = Persistence.createEntityManagerFactory("cinema");
 		EntityManager em = emf.createEntityManager();
 		
@@ -456,14 +455,19 @@ public class WService {
 		
 		DateFormat format = new SimpleDateFormat("yyyy-M-d", Locale.ENGLISH);
 		
+		List<Director> directors = em.createNamedQuery("Director.find", Director.class).setParameter("id", directorId).getResultList();
+		List<Category> categories = em.createNamedQuery("Category.find", Category.class).setParameter("id", categoryId).getResultList();
+		
 		Movie m = new Movie();
-		m.setAllocineLink(allocineLink);
-		m.setBudget(Integer.parseInt(budget));
-		m.setDuration(Integer.parseInt(duration));
-		m.setIncomings(Integer.parseInt(incomings));
-		m.setPicture(picture);
-		m.setReleaseDate(format.parse(releaseDate));
 		m.setTitle(title);
+		m.setDuration(Integer.parseInt(duration));
+		m.setReleaseDate(format.parse(releaseDate));
+		m.setBudget(Integer.parseInt(budget));
+		m.setIncomings(Integer.parseInt(incomings));
+		m.setDirector(directors.get(0));
+		m.setCategory(categories.get(0));
+		m.setPicture(picture);
+		m.setAllocineLink(allocineLink);
 		
 		em.persist(m);
 		
@@ -474,6 +478,8 @@ public class WService {
 	@POST
 	@Path("personage/add/")
 	public void addPersonage(
+			@FormParam("actor") int actorId,
+			@FormParam("movie") int movieId,
 			@FormParam("persName") String persName) {
 		emf = Persistence.createEntityManagerFactory("cinema");
 		EntityManager em = emf.createEntityManager();
@@ -482,6 +488,10 @@ public class WService {
 		
 		Personage p = new Personage();
 		p.setPersName(persName);
+		List<Movie> movies = em.createNamedQuery("Movie.find", Movie.class).setParameter("id", movieId).getResultList();
+		List<Actor> actors = em.createNamedQuery("Actor.find", Actor.class).setParameter("id", actorId).getResultList();
+		p.setActor(actors.get(0));
+		p.setMovie(movies.get(0));
 		
 		em.persist(p);
 		
@@ -500,7 +510,7 @@ public class WService {
 	@POST
 	@Path("/actor/edit/")
 	public void editActor(
-			@FormParam("noAct") String noAct,
+			@FormParam("noAct") String actorId,
 			@FormParam("birthdate") String birthdate,
 			@FormParam("deathdate") String deathdate,
 			@FormParam("firstnameAct") String firstnameAct,
@@ -511,14 +521,14 @@ public class WService {
 		
 		em.getTransaction().begin();
 		
-		Actor a = em.createNamedQuery("Actor.find", Actor.class).setParameter("id", noAct).getResultList().get(0);
+		Actor a = em.createNamedQuery("Actor.find", Actor.class).setParameter("id", actorId).getResultList().get(0);
 		
 		DateFormat format = new SimpleDateFormat("yyyy-M-d", Locale.ENGLISH);
 		
+		a.setLastnameAct(lastnameAct);
+		a.setFirstnameAct(firstnameAct);
 		a.setBirthdate(format.parse(birthdate));
 		a.setDeathdate(format.parse(deathdate));
-		a.setFirstnameAct(firstnameAct);
-		a.setLastnameAct(lastnameAct);
 		a.setPicture(picture);
 		
 		em.flush();
@@ -530,15 +540,15 @@ public class WService {
 	@POST
 	@Path("/category/edit/")
 	public void editCategory(
-			@FormParam("catCode") String categoryCatCode, 
-			@FormParam("wording") String categoryWording) {
+			@FormParam("catCode") String categoryId, 
+			@FormParam("wording") String wording) {
 		emf = Persistence.createEntityManagerFactory("cinema");
 		EntityManager em = emf.createEntityManager();
 		
 		em.getTransaction().begin();
 		
-		Category c = em.createNamedQuery("Category.find", Category.class).setParameter("id", categoryCatCode).getResultList().get(0);
-		c.setWording(categoryWording);
+		Category c = em.createNamedQuery("Category.find", Category.class).setParameter("id", categoryId).getResultList().get(0);
+		c.setWording(wording);
 		
 		em.flush();
 		
@@ -549,9 +559,9 @@ public class WService {
 	@POST
 	@Path("/director/edit/")
 	public void editDirector(
-			@FormParam("noRea") String noRea,
-			@FormParam("firstnameRea") String firstnameRea,
+			@FormParam("noRea") String directorId,
 			@FormParam("lastnameRea") String lastnameRea,
+			@FormParam("firstnameRea") String firstnameRea,
 			@FormParam("picture") String picture) {
 			
 		emf = Persistence.createEntityManagerFactory("cinema");
@@ -559,9 +569,9 @@ public class WService {
 		
 		em.getTransaction().begin();
 		
-		Director d = em.createNamedQuery("Director.find", Director.class).setParameter("id", noRea).getResultList().get(0);
-		d.setFirstnameRea(firstnameRea);
+		Director d = em.createNamedQuery("Director.find", Director.class).setParameter("id", directorId).getResultList().get(0);
 		d.setLastnameRea(lastnameRea);
+		d.setFirstnameRea(firstnameRea);
 		d.setPicture(picture);
 		
 		em.flush();
@@ -573,14 +583,16 @@ public class WService {
 	@POST
 	@Path("/movie/edit/")
 	public void editMovie(
-			@FormParam("noMovie") String noMovie,
-			@FormParam("allocineLink") String allocineLink,
-			@FormParam("budget") String budget,
+			@FormParam("noMovie") String movieId,
+			@FormParam("title") String title,
 			@FormParam("duration") String duration,
-			@FormParam("incomings") String incomings,
-			@FormParam("picture") String picture,
 			@FormParam("releaseDate") String releaseDate,
-			@FormParam("title") String title) throws ParseException {
+			@FormParam("budget") String budget,
+			@FormParam("incomings") String incomings,
+			@FormParam("director") String directorId,
+			@FormParam("category") String categoryId,
+			@FormParam("picture") String picture,
+			@FormParam("allocineLink") String allocineLink) throws ParseException {
 		emf = Persistence.createEntityManagerFactory("cinema");
 		EntityManager em = emf.createEntityManager();
 		
@@ -588,14 +600,19 @@ public class WService {
 		
 		DateFormat format = new SimpleDateFormat("yyyy-M-d", Locale.ENGLISH);
 		
-		Movie m = em.createNamedQuery("Movie.find", Movie.class).setParameter("id", noMovie).getResultList().get(0);
-		m.setAllocineLink(allocineLink);
-		m.setBudget(Integer.parseInt(budget));
-		m.setDuration(Integer.parseInt(duration));
-		m.setIncomings(Integer.parseInt(incomings));
-		m.setPicture(picture);
-		m.setReleaseDate(format.parse(releaseDate));
+		List<Director> directors = em.createNamedQuery("Director.find", Director.class).setParameter("id", directorId).getResultList();
+		List<Category> categories = em.createNamedQuery("Category.find", Category.class).setParameter("id", categoryId).getResultList();
+		
+		Movie m = em.createNamedQuery("Movie.find", Movie.class).setParameter("id", movieId).getResultList().get(0);
 		m.setTitle(title);
+		m.setDuration(Integer.parseInt(duration));
+		m.setReleaseDate(format.parse(releaseDate));
+		m.setBudget(Integer.parseInt(budget));
+		m.setIncomings(Integer.parseInt(incomings));
+		m.setDirector(directors.get(0));
+		m.setCategory(categories.get(0));
+		m.setPicture(picture);
+		m.setAllocineLink(allocineLink);
 		
 		em.flush();
 		
@@ -606,15 +623,15 @@ public class WService {
 	@POST
 	@Path("/personage/edit/")
 	public void editPersonage(
-			@FormParam("noMovie") String noMovie,
-			@FormParam("noAct") String noAct,
+			@FormParam("noMovie") String movieId,
+			@FormParam("noAct") String actorId,
 			@FormParam("persName") String persName) {
 		emf = Persistence.createEntityManagerFactory("cinema");
 		EntityManager em = emf.createEntityManager();
 		
 		em.getTransaction().begin();
 		
-		Personage p = em.createNamedQuery("Personage.find", Personage.class).setParameter("movieid", noMovie).setParameter("actorid", noAct)
+		Personage p = em.createNamedQuery("Personage.find", Personage.class).setParameter("movieid", movieId).setParameter("actorid", actorId)
 				.getResultList().get(0);
 		p.setPersName(persName);
 		

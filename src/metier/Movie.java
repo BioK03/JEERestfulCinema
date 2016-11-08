@@ -20,11 +20,12 @@ import java.util.List;
 	@NamedQuery(name="Movie.deleteByCategory", query="DELETE FROM Movie m WHERE m.category.catCode = :categoryid"),
 	@NamedQuery(name="Movie.search", query="SELECT m FROM Movie m WHERE m.title LIKE :term")
 })
+
 public class Movie implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private int noMovie;
 
 	private String allocineLink;

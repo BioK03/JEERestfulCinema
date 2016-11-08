@@ -137,14 +137,14 @@ public class WService {
 	@GET
 	@Path("/actor/{id}")
 	@Produces("application/json")
-	public String fetchActor(@PathParam("id")  int actorId) throws Exception
+	public String fetchActor(@PathParam("id")  String actorId) throws Exception
 	{
 		emf = Persistence.createEntityManagerFactory("cinema");
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
 		EntityManager em = emf.createEntityManager();
 		
 		em.getTransaction().begin();
-		List<Actor> actors = em.createNamedQuery("Actor.find", Actor.class).setParameter("id", actorId).getResultList();
+		List<Actor> actors = em.createNamedQuery("Actor.find", Actor.class).setParameter("id", Integer.parseInt(actorId)).getResultList();
 		
 		em.getTransaction().commit();
 		em.close();
@@ -156,14 +156,14 @@ public class WService {
 	@GET
 	@Path("/actor/movie/{movieid}")
 	@Produces("application/json")
-	public String fetchActorByMovie(@PathParam("movieid")  int movieId) throws Exception
+	public String fetchActorByMovie(@PathParam("movieid")  String movieId) throws Exception
 	{
 		emf = Persistence.createEntityManagerFactory("cinema");
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
 		EntityManager em = emf.createEntityManager();
 		
 		em.getTransaction().begin();
-		List<Personage> personages = em.createNamedQuery("Personage.findByMovie", Personage.class).setParameter("movieid", movieId).getResultList();
+		List<Personage> personages = em.createNamedQuery("Personage.findByMovie", Personage.class).setParameter("movieid", Integer.parseInt(movieId)).getResultList();
 		
 		List<Actor> actorList = new ArrayList<Actor>();
 		for(Personage p : personages)
@@ -200,14 +200,14 @@ public class WService {
 	@GET
 	@Path("/director/{id}")
 	@Produces("application/json")
-	public String fetchDirector(@PathParam("id")  int directorId) throws Exception
+	public String fetchDirector(@PathParam("id")  String directorId) throws Exception
 	{
 		emf = Persistence.createEntityManagerFactory("cinema");
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
 		EntityManager em = emf.createEntityManager();
 		
 		em.getTransaction().begin();
-		List<Director> directors = em.createNamedQuery("Director.find", Director.class).setParameter("id", directorId).getResultList();
+		List<Director> directors = em.createNamedQuery("Director.find", Director.class).setParameter("id", Integer.parseInt(directorId)).getResultList();
 		
 		em.getTransaction().commit();
 		em.close();
@@ -219,14 +219,14 @@ public class WService {
 	@GET
 	@Path("/movie/{id}")
 	@Produces("application/json")
-	public String fetchMovie(@PathParam("id")  int movieId) throws Exception
+	public String fetchMovie(@PathParam("id")  String movieId) throws Exception
 	{
 		emf = Persistence.createEntityManagerFactory("cinema");
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
 		EntityManager em = emf.createEntityManager();
 		
 		em.getTransaction().begin();
-		List<Movie> movies = em.createNamedQuery("Movie.find", Movie.class).setParameter("id", movieId).getResultList();
+		List<Movie> movies = em.createNamedQuery("Movie.find", Movie.class).setParameter("id", Integer.parseInt(movieId)).getResultList();
 		
 		em.getTransaction().commit();
 		em.close();
@@ -238,14 +238,14 @@ public class WService {
 	@GET
 	@Path("/movie/actor/{actorid}")
 	@Produces("application/json")
-	public String fetchMovieByActor(@PathParam("actorid")  int actorId) throws Exception
+	public String fetchMovieByActor(@PathParam("actorid")  String actorId) throws Exception
 	{
 		emf = Persistence.createEntityManagerFactory("cinema");
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
 		EntityManager em = emf.createEntityManager();
 		
 		em.getTransaction().begin();
-		List<Personage> personages = em.createNamedQuery("Personage.findByActor", Personage.class).setParameter("actorid", actorId).getResultList();
+		List<Personage> personages = em.createNamedQuery("Personage.findByActor", Personage.class).setParameter("actorid", Integer.parseInt(actorId)).getResultList();
 		
 		List<Movie> movies = new ArrayList<Movie>();
 		for(Personage p : personages)
@@ -282,14 +282,14 @@ public class WService {
 	@GET
 	@Path("/movie/director/{directorid}")
 	@Produces("application/json")
-	public String fetchMovieByDirector(@PathParam("directorid")  int directorId) throws Exception
+	public String fetchMovieByDirector(@PathParam("directorid")  String directorId) throws Exception
 	{
 		emf = Persistence.createEntityManagerFactory("cinema");
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
 		EntityManager em = emf.createEntityManager();
 		
 		em.getTransaction().begin();
-		List<Movie> movies = em.createNamedQuery("Movie.findByDirector", Movie.class).setParameter("directorid", directorId).getResultList();
+		List<Movie> movies = em.createNamedQuery("Movie.findByDirector", Movie.class).setParameter("directorid", Integer.parseInt(directorId)).getResultList();
 		
 		em.getTransaction().commit();
 		em.close();
@@ -301,14 +301,15 @@ public class WService {
 	@GET
 	@Path("/personage/{movieid}/{actorid}")
 	@Produces("application/json")
-	public String fetchPersonage(@PathParam("movieid")  int movieId, @PathParam("actorid") int actorId) throws Exception
+	public String fetchPersonage(@PathParam("movieid")  String movieId, @PathParam("actorid") String actorId) throws Exception
 	{
 		emf = Persistence.createEntityManagerFactory("cinema");
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
 		EntityManager em = emf.createEntityManager();
 		
 		em.getTransaction().begin();
-		List<Personage> personages = em.createNamedQuery("Personage.find", Personage.class).setParameter("movieid", movieId).setParameter("actorid", actorId).getResultList();
+		List<Personage> personages = em.createNamedQuery("Personage.find", Personage.class)
+				.setParameter("movieid", Integer.parseInt(movieId)).setParameter("actorid", Integer.parseInt(actorId)).getResultList();
 		
 		em.getTransaction().commit();
 		em.close();
@@ -320,14 +321,15 @@ public class WService {
 	@GET
 	@Path("/personage/movie/{movieid}")
 	@Produces("application/json")
-	public String fetchPersonageByMovie(@PathParam("movieid")  int movieId) throws Exception
+	public String fetchPersonageByMovie(@PathParam("movieid")  String movieId) throws Exception
 	{
 		emf = Persistence.createEntityManagerFactory("cinema");
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
 		EntityManager em = emf.createEntityManager();
 		
 		em.getTransaction().begin();
-		List<Personage> personages = em.createNamedQuery("Personage.findByMovie", Personage.class).setParameter("movieid", movieId).getResultList();
+		List<Personage> personages = em.createNamedQuery("Personage.findByMovie", Personage.class)
+				.setParameter("movieid", Integer.parseInt(movieId)).getResultList();
 		
 		em.getTransaction().commit();
 		em.close();
@@ -339,14 +341,15 @@ public class WService {
 	@GET
 	@Path("/personage/actor/{actorid}")
 	@Produces("application/json")
-	public String fetchPersonageByActor(@PathParam("actorid")  int actorId) throws Exception
+	public String fetchPersonageByActor(@PathParam("actorid")  String actorId) throws Exception
 	{
 		emf = Persistence.createEntityManagerFactory("cinema");
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
 		EntityManager em = emf.createEntityManager();
 		
 		em.getTransaction().begin();
-		List<Personage> personages = em.createNamedQuery("Personage.findByActor", Personage.class).setParameter("actorid", actorId).getResultList();
+		List<Personage> personages = em.createNamedQuery("Personage.findByActor", Personage.class)
+				.setParameter("actorid", Integer.parseInt(actorId)).getResultList();
 		
 		em.getTransaction().commit();
 		em.close();
@@ -382,8 +385,14 @@ public class WService {
 		
 		a.setLastnameAct(lastnameAct);
 		a.setFirstnameAct(firstnameAct);
-		a.setBirthdate(format.parse(birthdate));
-		a.setDeathdate(format.parse(deathdate));		
+		if(!birthdate.isEmpty())
+		{
+			a.setBirthdate(format.parse(birthdate));
+		}
+		if(!deathdate.isEmpty())
+		{
+			a.setDeathdate(format.parse(deathdate));
+		}
 		a.setPicture(picture);
 		
 		em.persist(a);
@@ -444,8 +453,8 @@ public class WService {
 			@FormParam("releaseDate") String releaseDate,
 			@FormParam("budget") String budget,
 			@FormParam("incomings") String incomings,
-			@FormParam("director") int directorId,
-			@FormParam("category") int categoryId,
+			@FormParam("director") String directorId,
+			@FormParam("category") String categoryId,
 			@FormParam("picture") String picture,
 			@FormParam("allocineLink") String allocineLink) throws ParseException {
 		emf = Persistence.createEntityManagerFactory("cinema");
@@ -461,7 +470,10 @@ public class WService {
 		Movie m = new Movie();
 		m.setTitle(title);
 		m.setDuration(Integer.parseInt(duration));
-		m.setReleaseDate(format.parse(releaseDate));
+		if(!releaseDate.isEmpty())
+		{
+			m.setReleaseDate(format.parse(releaseDate));
+		}
 		m.setBudget(Integer.parseInt(budget));
 		m.setIncomings(Integer.parseInt(incomings));
 		m.setDirector(directors.get(0));
@@ -478,8 +490,8 @@ public class WService {
 	@POST
 	@Path("personage/add/")
 	public void addPersonage(
-			@FormParam("actor") int actorId,
-			@FormParam("movie") int movieId,
+			@FormParam("actor") String actorId,
+			@FormParam("movie") String movieId,
 			@FormParam("persName") String persName) {
 		emf = Persistence.createEntityManagerFactory("cinema");
 		EntityManager em = emf.createEntityManager();
@@ -488,8 +500,8 @@ public class WService {
 		
 		Personage p = new Personage();
 		p.setPersName(persName);
-		List<Movie> movies = em.createNamedQuery("Movie.find", Movie.class).setParameter("id", movieId).getResultList();
-		List<Actor> actors = em.createNamedQuery("Actor.find", Actor.class).setParameter("id", actorId).getResultList();
+		List<Movie> movies = em.createNamedQuery("Movie.find", Movie.class).setParameter("id", Integer.parseInt(movieId)).getResultList();
+		List<Actor> actors = em.createNamedQuery("Actor.find", Actor.class).setParameter("id", Integer.parseInt(actorId)).getResultList();
 		p.setActor(actors.get(0));
 		p.setMovie(movies.get(0));
 		
@@ -521,14 +533,20 @@ public class WService {
 		
 		em.getTransaction().begin();
 		
-		Actor a = em.createNamedQuery("Actor.find", Actor.class).setParameter("id", actorId).getResultList().get(0);
+		Actor a = em.createNamedQuery("Actor.find", Actor.class).setParameter("id", Integer.parseInt(actorId)).getResultList().get(0);
 		
 		DateFormat format = new SimpleDateFormat("yyyy-M-d", Locale.ENGLISH);
 		
 		a.setLastnameAct(lastnameAct);
 		a.setFirstnameAct(firstnameAct);
-		a.setBirthdate(format.parse(birthdate));
-		a.setDeathdate(format.parse(deathdate));
+		if(!birthdate.isEmpty())
+		{
+			a.setBirthdate(format.parse(birthdate));
+		}
+		if(!deathdate.isEmpty())
+		{
+			a.setDeathdate(format.parse(deathdate));
+		}
 		a.setPicture(picture);
 		
 		em.flush();
@@ -571,7 +589,7 @@ public class WService {
 		
 		em.getTransaction().begin();
 		
-		Director d = em.createNamedQuery("Director.find", Director.class).setParameter("id", directorId).getResultList().get(0);
+		Director d = em.createNamedQuery("Director.find", Director.class).setParameter("id", Integer.parseInt(directorId)).getResultList().get(0);
 		d.setLastnameRea(lastnameRea);
 		d.setFirstnameRea(firstnameRea);
 		d.setPicture(picture);
@@ -602,13 +620,16 @@ public class WService {
 		
 		DateFormat format = new SimpleDateFormat("yyyy-M-d", Locale.ENGLISH);
 		
-		List<Director> directors = em.createNamedQuery("Director.find", Director.class).setParameter("id", directorId).getResultList();
+		List<Director> directors = em.createNamedQuery("Director.find", Director.class).setParameter("id", Integer.parseInt(directorId)).getResultList();
 		List<Category> categories = em.createNamedQuery("Category.find", Category.class).setParameter("id", categoryId).getResultList();
 		
-		Movie m = em.createNamedQuery("Movie.find", Movie.class).setParameter("id", movieId).getResultList().get(0);
+		Movie m = em.createNamedQuery("Movie.find", Movie.class).setParameter("id", Integer.parseInt(movieId)).getResultList().get(0);
 		m.setTitle(title);
 		m.setDuration(Integer.parseInt(duration));
-		m.setReleaseDate(format.parse(releaseDate));
+		if(!releaseDate.isEmpty())
+		{
+			m.setReleaseDate(format.parse(releaseDate));
+		}
 		m.setBudget(Integer.parseInt(budget));
 		m.setIncomings(Integer.parseInt(incomings));
 		m.setDirector(directors.get(0));
@@ -625,15 +646,16 @@ public class WService {
 	@POST
 	@Path("/personage/edit/")
 	public void editPersonage(
-			@FormParam("noMovie") String movieId,
-			@FormParam("noAct") String actorId,
+			@FormParam("movie") String movieId,
+			@FormParam("actor") String actorId,
 			@FormParam("persName") String persName) {
 		emf = Persistence.createEntityManagerFactory("cinema");
 		EntityManager em = emf.createEntityManager();
 		
 		em.getTransaction().begin();
 		
-		Personage p = em.createNamedQuery("Personage.find", Personage.class).setParameter("movieid", movieId).setParameter("actorid", actorId)
+		Personage p = em.createNamedQuery("Personage.find", Personage.class)
+				.setParameter("movieid", Integer.parseInt(movieId)).setParameter("actorid", Integer.parseInt(actorId))
 				.getResultList().get(0);
 		p.setPersName(persName);
 		
@@ -653,7 +675,7 @@ public class WService {
 	
 	@GET
 	@Path("/actor/delete/{id}")
-	public void deleteActor(@PathParam("id")  int actorId) throws Exception
+	public void deleteActor(@PathParam("id")  String actorId) throws Exception
 	{
 		emf = Persistence.createEntityManagerFactory("cinema");
 		EntityManager em = emf.createEntityManager();
@@ -684,13 +706,13 @@ public class WService {
 	
 	@GET
 	@Path("/director/delete/{id}")
-	public void deleteDirector(@PathParam("id")  int directorId) throws Exception
+	public void deleteDirector(@PathParam("id")  String directorId) throws Exception
 	{
 		emf = Persistence.createEntityManagerFactory("cinema");
 		EntityManager em = emf.createEntityManager();
 		
 		em.getTransaction().begin();
-		em.createNamedQuery("Director.delete", Director.class).setParameter("id", directorId).executeUpdate();
+		em.createNamedQuery("Director.delete", Director.class).setParameter("id", Integer.parseInt(directorId)).executeUpdate();
 		
 		em.getTransaction().commit();
 		em.close();
@@ -698,14 +720,14 @@ public class WService {
 	
 	@GET
 	@Path("/movie/delete/{id}")
-	public void deleteMovie(@PathParam("id")  int movieId) throws Exception
+	public void deleteMovie(@PathParam("id")  String movieId) throws Exception
 	{
 		emf = Persistence.createEntityManagerFactory("cinema");
 		EntityManager em = emf.createEntityManager();
 		
 		em.getTransaction().begin();
-		em.createNamedQuery("Personage.deleteByMovie", Personage.class).setParameter("movieid", movieId).executeUpdate();
-		em.createNamedQuery("Movie.delete", Movie.class).setParameter("id", movieId).executeUpdate();
+		em.createNamedQuery("Personage.deleteByMovie", Personage.class).setParameter("movieid", Integer.parseInt(movieId)).executeUpdate();
+		em.createNamedQuery("Movie.delete", Movie.class).setParameter("id", Integer.parseInt(movieId)).executeUpdate();
 		
 		em.getTransaction().commit();
 		em.close();
@@ -728,13 +750,14 @@ public class WService {
 	
 	@GET
 	@Path("/personage/delete/{movieid}/{actorid}")
-	public void deletePersonage(@PathParam("movieid")  int movieId, @PathParam("actorid") int actorId) throws Exception
+	public void deletePersonage(@PathParam("movieid")  String movieId, @PathParam("actorid") String actorId) throws Exception
 	{
 		emf = Persistence.createEntityManagerFactory("cinema");
 		EntityManager em = emf.createEntityManager();
 		
 		em.getTransaction().begin();
-		em.createNamedQuery("Personage.delete", Personage.class).setParameter("movieid", movieId).setParameter("actorid", actorId).executeUpdate();
+		em.createNamedQuery("Personage.delete", Personage.class)
+			.setParameter("movieid", Integer.parseInt(movieId)).setParameter("actorid", Integer.parseInt(actorId)).executeUpdate();
 		
 		em.getTransaction().commit();
 		em.close();
@@ -742,13 +765,13 @@ public class WService {
 	
 	@GET
 	@Path("/personage/delete/actor/{actorid}")
-	public void deletePersonageByActor(@PathParam("actorid") int actorId) throws Exception
+	public void deletePersonageByActor(@PathParam("actorid") String actorId) throws Exception
 	{
 		emf = Persistence.createEntityManagerFactory("cinema");
 		EntityManager em = emf.createEntityManager();
 		
 		em.getTransaction().begin();
-		em.createNamedQuery("Personage.deleteByActor", Personage.class).setParameter("actorid", actorId).executeUpdate();
+		em.createNamedQuery("Personage.deleteByActor", Personage.class).setParameter("actorid", Integer.parseInt(actorId)).executeUpdate();
 		
 		em.getTransaction().commit();
 		em.close();
@@ -756,13 +779,13 @@ public class WService {
 	
 	@GET
 	@Path("/personage/delete/movie/{movieid}")
-	public void deletePersonageByMovie(@PathParam("movieid") int movieId) throws Exception
+	public void deletePersonageByMovie(@PathParam("movieid") String movieId) throws Exception
 	{
 		emf = Persistence.createEntityManagerFactory("cinema");
 		EntityManager em = emf.createEntityManager();
 		
 		em.getTransaction().begin();
-		em.createNamedQuery("Personage.deleteByMovie", Personage.class).setParameter("movieid", movieId).executeUpdate();
+		em.createNamedQuery("Personage.deleteByMovie", Personage.class).setParameter("movieid", Integer.parseInt(movieId)).executeUpdate();
 		
 		em.getTransaction().commit();
 		em.close();
@@ -770,7 +793,7 @@ public class WService {
 	
 	@GET
 	@Path("/personage/delete/category/{categoryid}")
-	public void deletePersonageByCategory(@PathParam("categoryid") int categoryId) throws Exception
+	public void deletePersonageByCategory(@PathParam("categoryid") String categoryId) throws Exception
 	{
 		emf = Persistence.createEntityManagerFactory("cinema");
 		EntityManager em = emf.createEntityManager();

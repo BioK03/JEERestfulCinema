@@ -541,7 +541,8 @@ public class WService {
 	@Path("/category/edit/")
 	public void editCategory(
 			@FormParam("catCode") String categoryId, 
-			@FormParam("wording") String wording) {
+			@FormParam("wording") String wording,
+			@FormParam("picture") String picture) {
 		emf = Persistence.createEntityManagerFactory("cinema");
 		EntityManager em = emf.createEntityManager();
 		
@@ -549,6 +550,7 @@ public class WService {
 		
 		Category c = em.createNamedQuery("Category.find", Category.class).setParameter("id", categoryId).getResultList().get(0);
 		c.setWording(wording);
+		c.setPicture(picture);
 		
 		em.flush();
 		
